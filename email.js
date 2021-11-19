@@ -62,6 +62,13 @@ const email = {
             });
         });
     },
+
+    render(viewFile, context) {
+        const code = fs.readFileSync(viewFile, { encoding: 'utf-8' });
+        const template = handlebars.compile(code);
+        return template(context);
+    },
+
     /**
      * Sends a rendered view email
      * @param {string} to Recipient email address
@@ -74,9 +81,7 @@ const email = {
      */
     sendRendered(to, from, viewFile, context, subject = '', attachments = []) {
         return new Promise(async (resolve, reject) => {
-            const code = fs.readFileSync(viewFile, { encoding: 'utf-8' });
-            const template = handlebars.compile(code);
-            this.send(to, from, template(context), subject, attachments).then(resolve).catch(reject);
+            email.send(to, from, email.render(viewFile, context), subject, attachments).then(resolve).catch(reject);
         });
     }
 };
